@@ -5,6 +5,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
+from sklearn.preprocessing import StandardScaler
 
 np.random.seed(0)
 X, y = make_blobs(
@@ -37,11 +38,12 @@ print('three_cluster_count=', len(set(k_means3.labels_)))
 
 cust_df = pd.read_csv('Cust_Segmentation.csv')
 df = cust_df.drop('Address', axis=1)
-X2 = df.values[:, 1:]
+X2 = df.drop(columns=['Customer Id'], errors='ignore').select_dtypes(include=np.number).to_numpy()
 X2 = np.nan_to_num(X2)
+Clus_dataSet = StandardScaler().fit_transform(X2)
 clusterNum = 3
 k_means = KMeans(init='k-means++', n_clusters=clusterNum, n_init=12)
-k_means.fit(X2)
+k_means.fit(Clus_dataSet)
 labels = k_means.labels_
 df['Clus_km'] = labels
 print('customer_cluster_count=', df['Clus_km'].nunique())
